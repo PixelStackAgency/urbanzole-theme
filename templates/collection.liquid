@@ -1,0 +1,57 @@
+{% comment %} Collection Page Template {% endcomment %}
+
+<div class="collection-page">
+  <div class="container">
+    <div class="collection-hero">
+      <div class="label">{{ collection.title }}</div>
+      <h1 class="display-lg">{{ collection.title | upcase }}</h1>
+      {% if collection.description != blank %}
+        <p style="color:var(--grey-muted);font-style:italic;margin-top:1rem;max-width:560px">
+          {{ collection.description }}
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="collection-filters">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Sneakers</button>
+      <button class="filter-btn">Sandals</button>
+      <button class="filter-btn">Boots</button>
+      <button class="filter-btn">Loafers</button>
+      <button class="filter-btn">New Arrivals</button>
+      <button class="filter-btn">Sale</button>
+    </div>
+
+    <div style="padding:3rem 0">
+      {% paginate collection.products by 12 %}
+        <div class="products-grid">
+          {% for product in collection.products %}
+            {% render 'product-card', product: product %}
+          {% else %}
+            <p style="color:var(--grey-muted);grid-column:1/-1;text-align:center;padding:4rem 0;font-style:italic">
+              No products found in this collection.
+            </p>
+          {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:4rem">
+            {% if paginate.previous %}
+              <a href="{{ paginate.previous.url }}" class="btn btn--ghost">← Prev</a>
+            {% endif %}
+            {% for part in paginate.parts %}
+              {% if part.is_link %}
+                <a href="{{ part.url }}" class="btn btn--ghost">{{ part.title }}</a>
+              {% else %}
+                <span class="btn btn--primary">{{ part.title }}</span>
+              {% endif %}
+            {% endfor %}
+            {% if paginate.next %}
+              <a href="{{ paginate.next.url }}" class="btn btn--ghost">Next →</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endpaginate %}
+    </div>
+  </div>
+</div>

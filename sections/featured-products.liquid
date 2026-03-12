@@ -1,0 +1,59 @@
+{% comment %} Featured Products Section {% endcomment %}
+
+<section class="featured-products">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <div class="section-header__eyebrow label">{{ section.settings.eyebrow | default: "Drop Zone" }}</div>
+        <h2 class="display-lg reveal">{{ section.settings.title | default: "FEATURED DROPS" }}</h2>
+      </div>
+      {% if section.settings.view_all_url != blank %}
+        <a href="{{ section.settings.view_all_url }}" class="btn btn--ghost reveal reveal-delay-2">
+          View All
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      {% endif %}
+    </div>
+
+    {% assign collection = collections[section.settings.collection] %}
+    <div class="products-grid">
+      {% if collection != blank %}
+        {% for product in collection.products limit: section.settings.product_limit %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      {% else %}
+        {% for i in (1..4) %}
+          <div class="product-card">
+            <div class="product-card__image-wrap" style="background:var(--grey-mid)">
+              {{ 'product-' | append: i | placeholder_svg_tag: 'product-card__img' }}
+              <span class="product-card__badge">New</span>
+              <button class="product-card__quick-add">Quick Add</button>
+            </div>
+            <div class="product-card__category">Sneakers</div>
+            <div class="product-card__name">Sample Shoe {{ i }}</div>
+            <div class="product-card__price-wrap">
+              <span class="product-card__price">₹2,499</span>
+              <span class="product-card__price--compare">₹3,999</span>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Drop Zone" },
+    { "type": "text", "id": "title", "label": "Section title", "default": "FEATURED DROPS" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "product_limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "url", "id": "view_all_url", "label": "View all link" }
+  ],
+  "presets": [{ "name": "Featured Products" }]
+}
+{% endschema %}

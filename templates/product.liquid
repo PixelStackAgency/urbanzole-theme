@@ -1,0 +1,156 @@
+{% comment %} Product Page Template {% endcomment %}
+
+<article class="product-page container" itemscope itemtype="http://schema.org/Product">
+
+  <div class="product-gallery">
+    <div class="product-gallery__main">
+      {% if product.featured_image %}
+        <img
+          id="main-product-img"
+          src="{{ product.featured_image | image_url: width: 900 }}"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          loading="eager"
+          fetchpriority="high"
+          style="width:100%;height:100%;object-fit:cover"
+        >
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag }}
+      {% endif %}
+    </div>
+    {% if product.images.size > 1 %}
+      <div class="product-gallery__thumbs">
+        {% for image in product.images limit: 6 %}
+          <div class="product-gallery__thumb {% if forloop.first %}active{% endif %}">
+            <img
+              src="{{ image | image_url: width: 200 }}"
+              alt="{{ image.alt | default: product.title | escape }}"
+              loading="lazy"
+            >
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="product-info">
+    <nav class="product-info__breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      {% if product.collections.first %}
+        <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+        <span>/</span>
+      {% endif %}
+      <span aria-current="page">{{ product.title }}</span>
+    </nav>
+
+    <h1 class="product-info__title" itemprop="name">{{ product.title }}</h1>
+
+    <div class="product-info__price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+      <span class="product-info__price-main" itemprop="price" content="{{ product.price | money_without_currency }}">
+        {{ product.price | money }}
+      </span>
+      {% if product.compare_at_price > product.price %}
+        <span class="product-info__price-compare">{{ product.compare_at_price | money }}</span>
+        <span class="product-info__price-badge">
+          -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}% OFF
+        </span>
+      {% endif %}
+      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+    </div>
+
+    {% unless product.has_only_default_variant %}
+      {% for option in product.options_with_values %}
+        <div style="margin-bottom:1.5rem">
+          <div class="variant-label">
+            {{ option.name }}
+            {% if option.name == 'Size' %}
+              <span>— <a href="/pages/size-guide" style="color:var(--orange);text-decoration:underline">Size Guide</a></span>
+            {% endif %}
+          </div>
+          {% if option.name == 'Size' %}
+            <div class="size-options">
+              {% for value in option.values %}
+                {% assign variant_available = false %}
+                {% for variant in product.variants %}
+                  {% if variant.title contains value and variant.available %}
+                    {% assign variant_available = true %}
+                  {% endif %}
+                {% endfor %}
+                <button
+                  class="size-option {% unless variant_available %}sold-out{% endunless %}"
+                  data-variant-id="{{ product.variants | where: 'title', value | first | map: 'id' | first }}"
+                >
+                  {{ value }}
+                </button>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="size-options">
+              {% for value in option.values %}
+                <button class="size-option">{{ value }}</button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endunless %}
+
+    {% form 'product', product, data-product-form: '' %}
+      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+      <div class="product-add-wrap">
+        <div class="qty-input">
+          <button type="button" class="qty-btn" data-action="dec" aria-label="Decrease quantity">−</button>
+          <input class="qty-num" type="number" name="quantity" value="1" min="1" max="10" readonly>
+          <button type="button" class="qty-btn" data-action="inc" aria-label="Increase quantity">+</button>
+        </div>
+        <button
+          type="submit"
+          class="btn btn--primary"
+          style="flex:1"
+          {% unless product.available %}disabled{% endunless %}
+        >
+          {% if product.available %}
+            Add to Cart
+          {% else %}
+            Sold Out
+          {% endif %}
+        </button>
+      </div>
+    {% endform %}
+
+    <div class="product-info__features">
+      <div class="feature-row">
+        <div class="feature-row__icon">🚚</div>
+        <div class="feature-row__text">
+          <div class="feature-row__title">Free Shipping</div>
+          On orders above ₹999. Delivered in 2–5 business days.
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-row__icon">↩️</div>
+        <div class="feature-row__text">
+          <div class="feature-row__title">30-Day Returns</div>
+          Hassle-free returns. No questions asked.
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-row__icon">🛡️</div>
+        <div class="feature-row__text">
+          <div class="feature-row__title">Authentic Guarantee</div>
+          100% genuine products. Every pair quality-checked.
+        </div>
+      </div>
+    </div>
+
+    {% if product.description != blank %}
+      <div style="margin-top:2rem;padding-top:2rem;border-top:1px solid var(--grey-border)">
+        <h2 style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:1rem">Product Details</h2>
+        <div style="color:var(--grey-muted);font-size:0.9rem;line-height:1.8" itemprop="description">
+          {{ product.description }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+</article>

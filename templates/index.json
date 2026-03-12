@@ -1,0 +1,12 @@
+{
+  "sections": {
+    "hero": { "type": "hero-banner", "settings": { "heading_line1": "WALK", "heading_line2": "LOUD.", "heading_line3": "LIVE", "heading_line4": "BOLD.", "cta_primary_label": "Shop Collection", "cta_primary_url": "/collections/all", "cta_secondary_label": "View Lookbook" } },
+    "marquee": { "type": "marquee-strip", "settings": {} },
+    "featured": { "type": "featured-products", "settings": { "product_limit": 4, "view_all_url": "/collections/all" } },
+    "split": { "type": "split-feature", "settings": { "show_stats": true }, "blocks": { "s1": { "type": "stat", "settings": { "number": "50K+", "label": "Happy Customers" } }, "s2": { "type": "stat", "settings": { "number": "200+", "label": "Styles" } }, "s3": { "type": "stat", "settings": { "number": "5★", "label": "Avg. Rating" } } }, "block_order": ["s1","s2","s3"] },
+    "categories": { "type": "categories-grid", "settings": {}, "blocks": { "c1": { "type": "category", "settings": { "title": "Sneakers", "tag": "Street Ready" } }, "c2": { "type": "category", "settings": { "title": "Sandals", "tag": "Summer Edit" } }, "c3": { "type": "category", "settings": { "title": "Boots", "tag": "New Season" } }, "c4": { "type": "category", "settings": { "title": "Loafers", "tag": "Premium" } }, "c5": { "type": "category", "settings": { "title": "Slides", "tag": "Casual" } } }, "block_order": ["c1","c2","c3","c4","c5"] },
+    "testimonials": { "type": "testimonials", "settings": {}, "blocks": { "r1": { "type": "review", "settings": { "name": "Arjun M.", "review_text": "Best urban footwear I have owned. Built tough, looks premium.", "rating": 5 } }, "r2": { "type": "review", "settings": { "name": "Priya K.", "review_text": "The sneakers are fire. Still look fresh after months of wear.", "rating": 5 } }, "r3": { "type": "review", "settings": { "name": "Rahul D.", "review_text": "Delivered in 2 days. Fit is perfect. The sole grip is insane.", "rating": 5 } } }, "block_order": ["r1","r2","r3"] },
+    "newsletter": { "type": "newsletter", "settings": {} }
+  },
+  "order": ["hero", "marquee", "featured", "split", "categories", "testimonials", "newsletter"]
+}

@@ -1,0 +1,6 @@
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ page_title | default: shop.name }}">
+<meta property="og:description" content="{{ page_description | default: shop.description | escape }}">
+<meta name="twitter:card" content="summary_large_image">
+{% if settings.social_image %}<meta property="og:image" content="{{ settings.social_image | image_url: width: 1200 }}">{% endif %}

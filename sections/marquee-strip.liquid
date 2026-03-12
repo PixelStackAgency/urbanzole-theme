@@ -1,0 +1,27 @@
+{% comment %} Marquee Strip Section {% endcomment %}
+
+<div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-track">
+    {% assign items = section.settings.marquee_text | split: '|' %}
+    {% for i in (1..4) %}
+      {% for item in items %}
+        <span class="marquee-item">{{ item | strip }}</span>
+      {% endfor %}
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Marquee Strip",
+  "settings": [
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Marquee items (separate with |)",
+      "default": "Free Shipping on Orders ₹999+ | 30-Day Easy Returns | Handcrafted Premium Soles | New Drops Every Friday | COD Available"
+    }
+  ],
+  "presets": [{ "name": "Marquee Strip" }]
+}
+{% endschema %}

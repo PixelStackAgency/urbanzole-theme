@@ -1,0 +1,89 @@
+{% comment %} Hero Banner Section — UrbanZole {% endcomment %}
+
+<section class="hero" aria-label="Hero banner">
+
+  <div class="hero__left">
+    <div class="hero__label label reveal">
+      {{ section.settings.eyebrow | default: "New Collection 2025" }}
+    </div>
+
+    <h1 class="hero__title reveal reveal-delay-1">
+      {{ section.settings.heading_line1 | default: "WALK" }}
+      <span class="accent">{{ section.settings.heading_line2 | default: "LOUD." }}</span>
+      {{ section.settings.heading_line3 | default: "LIVE" }}<br>
+      {{ section.settings.heading_line4 | default: "BOLD." }}
+    </h1>
+
+    <p class="hero__sub reveal reveal-delay-2">
+      {{ section.settings.subheading | default: "Urban-engineered footwear built for streets that never sleep. Every step is a statement." }}
+    </p>
+
+    <div class="hero__cta reveal reveal-delay-3">
+      {% if section.settings.cta_primary_label != blank %}
+        <a href="{{ section.settings.cta_primary_url }}" class="btn btn--primary">
+          {{ section.settings.cta_primary_label }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      {% endif %}
+      {% if section.settings.cta_secondary_label != blank %}
+        <a href="{{ section.settings.cta_secondary_url }}" class="btn btn--ghost">
+          {{ section.settings.cta_secondary_label }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="hero__scroll-hint">
+      <div class="hero__scroll-line"></div>
+      Scroll to explore
+    </div>
+  </div>
+
+  <div class="hero__right">
+    {% if section.settings.hero_image != blank %}
+      <img
+        class="hero__image"
+        src="{{ section.settings.hero_image | image_url: width: 900 }}"
+        srcset="{{ section.settings.hero_image | image_url: width: 600 }} 600w,
+                {{ section.settings.hero_image | image_url: width: 900 }} 900w,
+                {{ section.settings.hero_image | image_url: width: 1200 }} 1200w"
+        sizes="(max-width: 768px) 100vw, 50vw"
+        alt="{{ section.settings.hero_image.alt | default: 'UrbanZole hero footwear' }}"
+        width="{{ section.settings.hero_image.width }}"
+        height="{{ section.settings.hero_image.height }}"
+        loading="eager"
+        fetchpriority="high"
+      >
+    {% else %}
+      <div style="width:100%;height:100%;background:linear-gradient(135deg, #1a1a1a 0%, #2a1a0a 100%);display:flex;align-items:center;justify-content:center">
+        <span style="font-family:var(--font-display);font-size:12vw;color:rgba(255,255,255,0.04);text-transform:uppercase">UZ</span>
+      </div>
+    {% endif %}
+    <div class="hero__right-overlay"></div>
+    <div class="hero__counter">{{ section.settings.counter_text | default: "Collection 01 / SS25" }}</div>
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "Hero Banner",
+  "tag": "section",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow text", "default": "New Collection 2025" },
+    { "type": "text", "id": "heading_line1", "label": "Heading line 1", "default": "WALK" },
+    { "type": "text", "id": "heading_line2", "label": "Heading line 2 (orange)", "default": "LOUD." },
+    { "type": "text", "id": "heading_line3", "label": "Heading line 3", "default": "LIVE" },
+    { "type": "text", "id": "heading_line4", "label": "Heading line 4", "default": "BOLD." },
+    { "type": "textarea", "id": "subheading", "label": "Subheading", "default": "Urban-engineered footwear built for streets that never sleep. Every step is a statement." },
+    { "type": "text", "id": "cta_primary_label", "label": "Primary button label", "default": "Shop Now" },
+    { "type": "url", "id": "cta_primary_url", "label": "Primary button URL" },
+    { "type": "text", "id": "cta_secondary_label", "label": "Secondary button label", "default": "View Lookbook" },
+    { "type": "url", "id": "cta_secondary_url", "label": "Secondary button URL" },
+    { "type": "image_picker", "id": "hero_image", "label": "Hero image" },
+    { "type": "text", "id": "counter_text", "label": "Counter text", "default": "Collection 01 / SS25" }
+  ],
+  "presets": [{ "name": "Hero Banner" }]
+}
+{% endschema %}

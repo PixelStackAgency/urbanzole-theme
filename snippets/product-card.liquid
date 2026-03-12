@@ -1,0 +1,39 @@
+{% comment %}
+  Product Card Snippet
+  Usage: {% render 'product-card', product: product %}
+{% endcomment %}
+
+<div class="product-card reveal">
+  <a href="{{ product.url }}" class="product-card__link" tabindex="-1">
+    <div class="product-card__image-wrap">
+      {% if product.featured_image %}
+        <img
+          class="product-card__img"
+          src="{{ product.featured_image | image_url: width: 500 }}"
+          alt="{{ product.featured_image.alt | default: product.title | escape }}"
+          loading="lazy"
+        >
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'product-card__img' }}
+      {% endif %}
+      {% if product.compare_at_price > product.price %}
+        <span class="product-card__badge">
+          -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%
+        </span>
+      {% elsif product.tags contains 'new' %}
+        <span class="product-card__badge">New</span>
+      {% endif %}
+      {% if product.available %}
+        <button class="product-card__quick-add" data-quick-add="{{ product.selected_or_first_available_variant.id }}">Quick Add</button>
+      {% endif %}
+    </div>
+  </a>
+  <div class="product-card__category">{{ product.type | default: product.tags.first }}</div>
+  <h3 class="product-card__name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
+  <div class="product-card__price-wrap">
+    <span class="product-card__price">{{ product.price | money }}</span>
+    {% if product.compare_at_price > product.price %}
+      <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,45 @@
+{% comment %} Newsletter Section {% endcomment %}
+
+<section class="newsletter">
+  <div class="container">
+    <div class="label reveal">{{ section.settings.eyebrow | default: "Stay In The Loop" }}</div>
+    <h2 class="newsletter__title reveal reveal-delay-1">
+      {{ section.settings.title_line1 | default: "DROP" }}
+      <span class="accent">{{ section.settings.title_line2 | default: "ALERTS" }}</span><br>
+      {{ section.settings.title_line3 | default: "FIRST." }}
+    </h2>
+    <p class="newsletter__sub reveal reveal-delay-2">
+      {{ section.settings.subtext | default: "Get exclusive early access to new drops, limited collabs, and member-only deals." }}
+    </p>
+    {% form 'customer', class: 'newsletter__form reveal reveal-delay-3' %}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <input
+        class="newsletter__input"
+        type="email"
+        name="contact[email]"
+        placeholder="{{ section.settings.placeholder | default: 'your@email.com' }}"
+        required
+        autocomplete="email"
+      >
+      <button type="submit" class="btn btn--primary">
+        {{ section.settings.btn_label | default: "Subscribe" }}
+      </button>
+    {% endform %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Stay In The Loop" },
+    { "type": "text", "id": "title_line1", "label": "Title line 1", "default": "DROP" },
+    { "type": "text", "id": "title_line2", "label": "Title line 2 (orange)", "default": "ALERTS" },
+    { "type": "text", "id": "title_line3", "label": "Title line 3", "default": "FIRST." },
+    { "type": "text", "id": "subtext", "label": "Subtext", "default": "Get exclusive early access to new drops, limited collabs, and member-only deals." },
+    { "type": "text", "id": "placeholder", "label": "Input placeholder", "default": "your@email.com" },
+    { "type": "text", "id": "btn_label", "label": "Button label", "default": "Subscribe" }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}
