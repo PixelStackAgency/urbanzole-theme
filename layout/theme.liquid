@@ -3,46 +3,122 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0A0A0A">
   <link rel="canonical" href="{{ canonical_url }}">
-  {% if settings.favicon %}
-    <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
+  {% if settings.favicon != blank %}
+    <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 64 }}" type="image/png">
   {% endif %}
-  <title>
-    {{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}
-  </title>
-  {% if page_description %}
-    <meta name="description" content="{{ page_description | escape }}">
-  {% endif %}
+  <title>{{ page_title }}{% unless page_title contains shop.name %} — {{ shop.name }}{% endunless %}</title>
+  {% if page_description %}<meta name="description" content="{{ page_description | escape }}">{% endif %}
+  {% render 'seo-tags' %}
   {{ content_for_header }}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   {{ 'theme.css' | asset_url | stylesheet_tag }}
 </head>
-<body class="uz-body">
-  <a class="skip-link" href="#MainContent">Skip to content</a>
+<body class="uz-body" data-template="{{ template.name }}">
+
+  {% section 'announcement-bar' %}
   {% section 'header' %}
-  <main id="MainContent" class="main-content" role="main" tabindex="-1">
-    {{ content_for_layout }}
-  </main>
-  {% section 'footer' %}
-  <div id="uz-cart-drawer" class="cart-drawer" aria-hidden="true">
-    <div class="cart-drawer__overlay"></div>
-    <div class="cart-drawer__panel">
-      <div class="cart-drawer__header">
-        <span>Your Cart (<span id="cart-count">0</span>)</span>
-        <button class="cart-drawer__close" aria-label="Close cart">&#x2715;</button>
+
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <div class="mm-backdrop"></div>
+    <div class="mm-panel">
+      <div class="mm-head">
+        <a href="{{ routes.root_url }}" class="mm-logo">URBAN<span>ZOLE</span></a>
+        <button class="mm-close icon-btn" id="mm-close" aria-label="Close menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
       </div>
-      <div class="cart-drawer__body" id="cart-drawer-body">
-        <p class="cart-empty">Your cart is empty.</p>
-      </div>
-      <div class="cart-drawer__footer">
-        <a href="/cart" class="btn btn--primary btn--full">Checkout</a>
+      <nav class="mm-nav">
+        {% for link in linklists[settings.nav_menu].links %}
+          <a href="{{ link.url }}" class="mm-link{% if link.active %} active{% endif %}">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+      <div class="mm-divider"></div>
+      <div class="mm-foot">
+        {% if shop.customer_accounts_enabled %}
+          {% if customer %}
+            <a href="{{ routes.account_url }}" class="mm-util-link">My Account</a>
+            <a href="{{ routes.account_logout_url }}" class="mm-util-link">Log Out</a>
+          {% else %}
+            <a href="{{ routes.account_login_url }}" class="mm-util-link">Sign In</a>
+            <a href="{{ routes.account_register_url }}" class="mm-util-link">Register</a>
+          {% endif %}
+        {% endif %}
+        <a href="{{ routes.search_url }}" class="mm-util-link">Search</a>
       </div>
     </div>
   </div>
+
+  <div id="search-overlay" class="search-overlay" aria-hidden="true">
+    <div class="so-backdrop"></div>
+    <div class="so-panel">
+      <form action="{{ routes.search_url }}" method="get" class="so-form">
+        <input type="hidden" name="type" value="product">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="so-input" class="so-input" type="search" name="q" placeholder="Search for sneakers, boots, sandals..." autocomplete="off" autofocus>
+        <button type="button" class="icon-btn" id="so-close" aria-label="Close search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </form>
+      <div class="so-popular">
+        <span class="so-label">Popular:</span>
+        <a href="{{ routes.search_url }}?type=product&q=sneakers" class="so-tag">Sneakers</a>
+        <a href="{{ routes.search_url }}?type=product&q=boots" class="so-tag">Boots</a>
+        <a href="{{ routes.search_url }}?type=product&q=sandals" class="so-tag">Sandals</a>
+        <a href="{{ routes.search_url }}?type=product&q=loafers" class="so-tag">Loafers</a>
+        <a href="{{ routes.search_url }}?type=product&q=sale" class="so-tag">Sale</a>
+      </div>
+      <div id="so-results" class="so-results"></div>
+    </div>
+  </div>
+
+  <div id="cart-drawer" class="cart-drawer" aria-hidden="true">
+    <div class="cd-backdrop"></div>
+    <div class="cd-panel">
+      <div class="cd-head">
+        <h2 class="cd-title">Cart (<span id="cd-count">0</span>)</h2>
+        <button class="icon-btn" id="cd-close" aria-label="Close cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="cd-body" class="cd-body">
+        <div class="cd-empty">
+          <div class="cd-empty-icon">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <p>Nothing in your cart yet.</p>
+          <button class="btn btn--primary cd-shop-btn">Shop Now</button>
+        </div>
+      </div>
+      <div class="cd-foot" id="cd-foot" hidden>
+        <div class="cd-subtotal-row">
+          <span>Subtotal</span>
+          <strong id="cd-total" class="cd-total">—</strong>
+        </div>
+        <p class="cd-note">Shipping & taxes calculated at checkout</p>
+        <a href="{{ routes.cart_url }}" class="btn btn--ghost btn--full">View Full Cart</a>
+        <a href="/checkout" class="btn btn--primary btn--full">Checkout →</a>
+        <button class="cd-continue" id="cd-continue">← Continue Shopping</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="uz-toast" class="uz-toast" aria-live="polite" aria-atomic="true"></div>
+
+  <main id="MainContent" class="site-main" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+
+  {% section 'footer' %}
+
+  <button class="back-top" id="back-top" aria-label="Back to top" hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+
   {{ 'theme.js' | asset_url | script_tag }}
 </body>
 </html>

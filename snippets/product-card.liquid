@@ -1,39 +1,45 @@
-{% comment %}
-  Product Card Snippet
-  Usage: {% render 'product-card', product: product %}
-{% endcomment %}
-
+{% comment %}Usage: {% render 'product-card', product: product %}{% endcomment %}
+{% assign save_pct = 0 %}
+{% if product.compare_at_price > product.price %}
+  {% assign save_pct = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+{% endif %}
 <div class="product-card reveal">
-  <a href="{{ product.url }}" class="product-card__link" tabindex="-1">
-    <div class="product-card__image-wrap">
+  <div class="product-card-image">
+    <a href="{{ product.url }}" tabindex="-1" aria-label="{{ product.title }}">
       {% if product.featured_image %}
-        <img
-          class="product-card__img"
-          src="{{ product.featured_image | image_url: width: 500 }}"
-          alt="{{ product.featured_image.alt | default: product.title | escape }}"
-          loading="lazy"
-        >
+        <img src="{{ product.featured_image | image_url: width: 600 }}"
+             srcset="{{ product.featured_image | image_url: width: 400 }} 400w, {{ product.featured_image | image_url: width: 600 }} 600w"
+             sizes="(max-width: 480px) 50vw, (max-width: 1024px) 33vw, 25vw"
+             alt="{{ product.featured_image.alt | default: product.title | escape }}"
+             loading="lazy" width="{{ product.featured_image.width }}" height="{{ product.featured_image.height }}">
       {% else %}
-        {{ 'product-1' | placeholder_svg_tag: 'product-card__img' }}
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
       {% endif %}
-      {% if product.compare_at_price > product.price %}
-        <span class="product-card__badge">
-          -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%
-        </span>
-      {% elsif product.tags contains 'new' %}
-        <span class="product-card__badge">New</span>
+    </a>
+    {% unless product.available %}<span class="product-badge product-badge--sold">Sold Out</span>
+    {% else %}
+      {% if save_pct > 0 %}<span class="product-badge product-badge--sale">-{{ save_pct }}%</span>
+      {% elsif product.tags contains 'new' %}<span class="product-badge product-badge--new">New</span>
       {% endif %}
-      {% if product.available %}
-        <button class="product-card__quick-add" data-quick-add="{{ product.selected_or_first_available_variant.id }}">Quick Add</button>
-      {% endif %}
-    </div>
-  </a>
-  <div class="product-card__category">{{ product.type | default: product.tags.first }}</div>
-  <h3 class="product-card__name"><a href="{{ product.url }}">{{ product.title }}</a></h3>
-  <div class="product-card__price-wrap">
-    <span class="product-card__price">{{ product.price | money }}</span>
+    {% endunless %}
+    <button class="product-card-wishlist" aria-label="Save {{ product.title }}">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    {% if product.available %}
+      <button class="quick-add-btn"
+              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              data-product-url="{{ product.url }}">
+        {% if product.variants.size > 1 %}Choose Size{% else %}Quick Add{% endif %}
+      </button>
+    {% endif %}
+  </div>
+  <div class="product-card-cat">{{ product.type | default: product.tags.first }}</div>
+  <div class="product-card-name"><a href="{{ product.url }}">{{ product.title }}</a></div>
+  <div class="product-card-price">
+    <span class="price-main">{{ product.price | money }}</span>
     {% if product.compare_at_price > product.price %}
-      <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+      <span class="price-compare">{{ product.compare_at_price | money }}</span>
+      <span class="price-save">Save {{ save_pct }}%</span>
     {% endif %}
   </div>
 </div>

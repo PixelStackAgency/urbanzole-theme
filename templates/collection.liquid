@@ -1,54 +1,76 @@
-{% comment %} Collection Page Template {% endcomment %}
-
-<div class="collection-page">
-  <div class="container">
-    <div class="collection-hero">
-      <div class="label">{{ collection.title }}</div>
-      <h1 class="display-lg">{{ collection.title | upcase }}</h1>
-      {% if collection.description != blank %}
-        <p style="color:var(--grey-muted);font-style:italic;margin-top:1rem;max-width:560px">
-          {{ collection.description }}
-        </p>
-      {% endif %}
-    </div>
-
-    <div class="collection-filters">
-      <button class="filter-btn active">All</button>
-      <button class="filter-btn">Sneakers</button>
-      <button class="filter-btn">Sandals</button>
-      <button class="filter-btn">Boots</button>
-      <button class="filter-btn">Loafers</button>
-      <button class="filter-btn">New Arrivals</button>
-      <button class="filter-btn">Sale</button>
-    </div>
-
-    <div style="padding:3rem 0">
+<div class="collection-page container">
+  <div class="collection-hero">
+    <div class="t-label reveal">Collection</div>
+    <h1 class="section-title reveal d1">{{ collection.title | upcase }}</h1>
+    {% if collection.description != blank %}<p style="color:var(--grey-400);font-style:italic;margin-top:1rem;max-width:560px" class="reveal d2">{{ collection.description }}</p>{% endif %}
+  </div>
+  <div class="collection-layout">
+    <!-- Sidebar -->
+    <aside class="filter-sidebar">
+      <div class="filter-group">
+        <div class="filter-group-title">Category <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        <div class="filter-group-body">
+          <label class="filter-check"><input type="checkbox"> <span>Sneakers</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>Sandals</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>Boots</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>Loafers</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>Slides</span></label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-title">Size <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        <div class="filter-group-body">
+          {% for size in "6,7,8,9,10,11,12" | split: "," %}
+            <label class="filter-check"><input type="checkbox"> <span>UK {{ size }}</span></label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-group-title">Price <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></div>
+        <div class="filter-group-body">
+          <div class="filter-price-range">
+            <div class="range-inputs">
+              <input class="range-input" type="number" placeholder="₹0" min="0">
+              <span style="color:var(--grey-500)">–</span>
+              <input class="range-input" type="number" placeholder="₹9999" min="0">
+            </div>
+            <button class="btn btn--ghost btn--sm" style="align-self:flex-start" onclick="alert('Filter applied!')">Apply</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <!-- Products -->
+    <div>
+      <div class="collection-toolbar">
+        <span class="collection-count">{{ collection.products_count }} products</span>
+        <select class="sort-select" onchange="window.location.href='?sort_by='+this.value">
+          <option value="manual" {% if current_tags %}{% endif %}>Sort: Featured</option>
+          <option value="price-ascending">Price: Low to High</option>
+          <option value="price-descending">Price: High to Low</option>
+          <option value="created-descending">Newest</option>
+          <option value="best-selling">Best Selling</option>
+        </select>
+      </div>
       {% paginate collection.products by 12 %}
         <div class="products-grid">
           {% for product in collection.products %}
             {% render 'product-card', product: product %}
           {% else %}
-            <p style="color:var(--grey-muted);grid-column:1/-1;text-align:center;padding:4rem 0;font-style:italic">
-              No products found in this collection.
-            </p>
+            <div style="grid-column:1/-1;text-align:center;padding:5rem 0;color:var(--grey-400)">
+              <p style="font-family:var(--font-display);font-size:2rem;text-transform:uppercase;margin-bottom:.5rem">No Products Found</p>
+              <p style="font-style:italic">Try adjusting your filters or <a href="/collections/all" style="color:var(--orange)">browse all products</a>.</p>
+            </div>
           {% endfor %}
         </div>
-
         {% if paginate.pages > 1 %}
-          <div style="display:flex;justify-content:center;gap:0.5rem;margin-top:4rem">
-            {% if paginate.previous %}
-              <a href="{{ paginate.previous.url }}" class="btn btn--ghost">← Prev</a>
-            {% endif %}
+          <div class="pagination">
+            {% if paginate.previous %}<a href="{{ paginate.previous.url }}" class="page-btn">← Prev</a>{% endif %}
             {% for part in paginate.parts %}
-              {% if part.is_link %}
-                <a href="{{ part.url }}" class="btn btn--ghost">{{ part.title }}</a>
-              {% else %}
-                <span class="btn btn--primary">{{ part.title }}</span>
+              {% if part.is_link %}<a href="{{ part.url }}" class="page-btn">{{ part.title }}</a>
+              {% else %}<span class="page-btn {% if part.title == paginate.current_page %}active{% else %}dots{% endif %}">{{ part.title }}</span>
               {% endif %}
             {% endfor %}
-            {% if paginate.next %}
-              <a href="{{ paginate.next.url }}" class="btn btn--ghost">Next →</a>
-            {% endif %}
+            {% if paginate.next %}<a href="{{ paginate.next.url }}" class="page-btn">Next →</a>{% endif %}
           </div>
         {% endif %}
       {% endpaginate %}

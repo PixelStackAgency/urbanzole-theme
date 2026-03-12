@@ -1,85 +1,46 @@
-{% comment %} Split Feature Section {% endcomment %}
-
 <section class="split-feature">
-  <div class="split-feature__image-side">
+  <div class="sf-media">
     {% if section.settings.image != blank %}
-      <img
-        src="{{ section.settings.image | image_url: width: 900 }}"
-        alt="{{ section.settings.image.alt | default: section.settings.title }}"
-        width="{{ section.settings.image.width }}"
-        height="{{ section.settings.image.height }}"
-        loading="lazy"
-        style="width:100%;height:100%;object-fit:cover;filter:brightness(0.7)"
-      >
+      <img src="{{ section.settings.image | image_url: width: 1000 }}" alt="{{ section.settings.image.alt | default: section.settings.title_line1 }}" loading="lazy">
     {% else %}
-      <div style="width:100%;height:100%;min-height:60vh;background:linear-gradient(160deg,#1a0a00,#2a1500);display:flex;align-items:center;justify-content:center">
-        {{ 'image' | placeholder_svg_tag }}
-      </div>
+      <div style="width:100%;height:100%;min-height:60vh;background:linear-gradient(160deg,#1a0500,#2a1000,#0a0a0a);display:flex;align-items:center;justify-content:center"><span style="font-family:var(--font-display);font-size:14vw;color:rgba(255,255,255,.03)">UZ</span></div>
     {% endif %}
   </div>
-
-  <div class="split-feature__content-side">
-    <div class="split-feature__number reveal">{{ section.settings.section_number | default: "01" }}</div>
-    <p class="label reveal reveal-delay-1">{{ section.settings.eyebrow | default: "Our Craft" }}</p>
-    <h2 class="split-feature__title reveal reveal-delay-2">
-      {{ section.settings.title_line1 | default: "BUILT FOR" }}
-      <span class="line-accent">{{ section.settings.title_line2 | default: "THE STREETS" }}</span>
-    </h2>
-    <p class="split-feature__body reveal reveal-delay-3">
-      {{ section.settings.body | default: "Every pair of UrbanZole shoes is engineered with urban warriors in mind — durability that outlasts the concrete, comfort that keeps you moving, and style that turns heads without trying." }}
-    </p>
-    {% if section.settings.cta_label != blank %}
-      <a href="{{ section.settings.cta_url }}" class="btn btn--primary reveal reveal-delay-4" style="align-self:flex-start">
-        {{ section.settings.cta_label }}
-      </a>
+  <div class="sf-content">
+    <div class="sf-number reveal">{{ section.settings.number | default: "01" }}</div>
+    <div class="t-label reveal d1">{{ section.settings.eyebrow | default: "Our Craft" }}</div>
+    <h2 class="sf-title reveal d2">{{ section.settings.title_line1 | default: "BUILT FOR" }}<span>{{ section.settings.title_line2 | default: "THE STREETS" }}</span></h2>
+    <p class="sf-body reveal d3">{{ section.settings.body | default: "Every pair of UrbanZole shoes is engineered for urban warriors — durability that outlasts the concrete, comfort that keeps you moving, and style that turns heads without trying." }}</p>
+    {% if section.settings.btn_label != blank %}
+      <a href="{{ section.settings.btn_url | default: '/pages/about' }}" class="btn btn--primary reveal d4" style="align-self:flex-start">{{ section.settings.btn_label }}</a>
     {% endif %}
-
     {% if section.settings.show_stats %}
-    <div class="split-feature__stats">
-      {% for block in section.blocks %}
-        {% if block.type == 'stat' %}
-          <div class="stat reveal reveal-delay-{{ forloop.index }}">
-            <div class="stat__number">{{ block.settings.number }}</div>
-            <div class="stat__label">{{ block.settings.label }}</div>
-          </div>
-        {% endif %}
-      {% endfor %}
+    <div class="sf-stats">
+      {% for block in section.blocks %}{% if block.type == 'stat' %}
+        <div class="reveal" style="transition-delay:{{ forloop.index | times: 0.1 }}s">
+          <div class="stat-num">{{ block.settings.number }}</div>
+          <div class="stat-label">{{ block.settings.label }}</div>
+        </div>
+      {% endif %}{% endfor %}
     </div>
     {% endif %}
   </div>
 </section>
-
 {% schema %}
 {
   "name": "Split Feature",
   "settings": [
-    { "type": "text", "id": "section_number", "label": "Section number", "default": "01" },
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Our Craft" },
-    { "type": "text", "id": "title_line1", "label": "Title line 1", "default": "BUILT FOR" },
-    { "type": "text", "id": "title_line2", "label": "Title line 2 (orange)", "default": "THE STREETS" },
-    { "type": "textarea", "id": "body", "label": "Body text" },
-    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Our Story" },
-    { "type": "url", "id": "cta_url", "label": "Button URL" },
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "checkbox", "id": "show_stats", "label": "Show stats", "default": true }
+    {"type":"text","id":"number","label":"Section number","default":"01"},
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Our Craft"},
+    {"type":"text","id":"title_line1","label":"Title line 1","default":"BUILT FOR"},
+    {"type":"text","id":"title_line2","label":"Title line 2 (orange)","default":"THE STREETS"},
+    {"type":"textarea","id":"body","label":"Body text"},
+    {"type":"text","id":"btn_label","label":"Button label","default":"Our Story"},
+    {"type":"url","id":"btn_url","label":"Button URL"},
+    {"type":"image_picker","id":"image","label":"Image"},
+    {"type":"checkbox","id":"show_stats","label":"Show stats","default":true}
   ],
-  "blocks": [
-    {
-      "type": "stat",
-      "name": "Stat",
-      "settings": [
-        { "type": "text", "id": "number", "label": "Number", "default": "50K+" },
-        { "type": "text", "id": "label", "label": "Label", "default": "Happy Customers" }
-      ]
-    }
-  ],
-  "presets": [{
-    "name": "Split Feature",
-    "blocks": [
-      { "type": "stat", "settings": { "number": "50K+", "label": "Happy Customers" } },
-      { "type": "stat", "settings": { "number": "200+", "label": "Styles Available" } },
-      { "type": "stat", "settings": { "number": "5★", "label": "Avg. Rating" } }
-    ]
-  }]
+  "blocks":[{"type":"stat","name":"Stat","settings":[{"type":"text","id":"number","label":"Number","default":"50K+"},{"type":"text","id":"label","label":"Label","default":"Happy Customers"}]}],
+  "presets":[{"name":"Split Feature","blocks":[{"type":"stat","settings":{"number":"50K+","label":"Happy Customers"}},{"type":"stat","settings":{"number":"200+","label":"Styles"}},{"type":"stat","settings":{"number":"5★","label":"Avg Rating"}}]}]
 }
 {% endschema %}

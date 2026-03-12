@@ -1,40 +1,16 @@
 [
-  {
-    "name": "theme_info",
-    "theme_name": "UrbanZole",
-    "theme_version": "1.0.0",
-    "theme_author": "UrbanZole",
-    "theme_documentation_url": "https://github.com/your-username/urbanzole-theme",
-    "theme_support_url": "https://urbanzole.in"
-  },
-  {
-    "name": "Colors",
-    "settings": [
-      { "type": "color", "id": "accent_color", "label": "Accent color", "default": "#FF4500" }
-    ]
-  },
-  {
-    "name": "Typography",
-    "settings": [
-      { "type": "select", "id": "body_font_size", "label": "Base font size", "options": [{"value":"14px","label":"14px"},{"value":"16px","label":"16px"},{"value":"18px","label":"18px"}], "default": "16px" }
-    ]
-  },
-  {
-    "name": "Favicon",
-    "settings": [
-      { "type": "image_picker", "id": "favicon", "label": "Favicon image" }
-    ]
-  },
-  {
-    "name": "Social sharing image",
-    "settings": [
-      { "type": "image_picker", "id": "social_image", "label": "Default social sharing image" }
-    ]
-  },
-  {
-    "name": "Cart",
-    "settings": [
-      { "type": "select", "id": "cart_type", "label": "Cart type", "options": [{"value":"drawer","label":"Slide-out drawer"},{"value":"page","label":"Cart page"}], "default": "drawer" }
-    ]
-  }
+  {"name":"theme_info","theme_name":"UrbanZole","theme_version":"2.0.0","theme_author":"UrbanZole","theme_documentation_url":"https://github.com/your-username/urbanzole-theme"},
+  {"name":"Brand","settings":[
+    {"type":"image_picker","id":"favicon","label":"Favicon"},
+    {"type":"image_picker","id":"og_image","label":"Social sharing image"}
+  ]},
+  {"name":"Navigation","settings":[
+    {"type":"link_list","id":"nav_menu","label":"Main navigation menu","default":"main-menu"}
+  ]},
+  {"name":"Colors","settings":[
+    {"type":"color","id":"accent","label":"Accent color","default":"#FF4500"}
+  ]},
+  {"name":"Cart","settings":[
+    {"type":"select","id":"cart_type","label":"Cart type","options":[{"value":"drawer","label":"Slide-out drawer"},{"value":"page","label":"Cart page"}],"default":"drawer"}
+  ]}
 ]

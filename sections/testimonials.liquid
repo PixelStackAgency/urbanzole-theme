@@ -1,71 +1,50 @@
-{% comment %} Testimonials Section {% endcomment %}
-
-<section class="testimonials">
+<section class="section">
   <div class="container">
     <div class="section-header">
       <div>
-        <div class="section-header__eyebrow label">{{ section.settings.eyebrow | default: "Reviews" }}</div>
-        <h2 class="display-lg reveal">{{ section.settings.title | default: "WHAT THEY SAY" }}</h2>
+        <div class="t-label reveal">{{ section.settings.eyebrow | default: "Reviews" }}</div>
+        <h2 class="section-title reveal d1">{{ section.settings.title | default: "WHAT THEY SAY" }}</h2>
       </div>
     </div>
     <div class="testimonials-track" role="list">
-      {% for block in section.blocks %}
-        {% if block.type == 'review' %}
-          <div class="testimonial-card reveal" role="listitem" {{ block.shopify_attributes }}>
-            <div class="testimonial-card__stars">
-              {% for i in (1..block.settings.rating) %}★{% endfor %}
-              {% assign remaining = 5 | minus: block.settings.rating %}
-              {% for i in (1..remaining) %}☆{% endfor %}
+      {% for block in section.blocks %}{% if block.type == 'review' %}
+        <div class="testi-card reveal" role="listitem" {{ block.shopify_attributes }}>
+          <div class="testi-stars">{% for i in (1..block.settings.rating) %}★{% endfor %}{% assign r = 5 | minus: block.settings.rating %}{% for i in (1..r) %}☆{% endfor %}</div>
+          <p class="testi-text">"{{ block.settings.text }}"</p>
+          <div class="testi-author">
+            <div class="testi-avatar">
+              {% if block.settings.avatar != blank %}<img src="{{ block.settings.avatar | image_url: width: 100 }}" alt="{{ block.settings.name }}" loading="lazy">
+              {% else %}{{ block.settings.name | slice: 0 }}{% endif %}
             </div>
-            <p class="testimonial-card__text">"{{ block.settings.review_text }}"</p>
-            <div class="testimonial-card__author">
-              {% if block.settings.avatar != blank %}
-                <img class="testimonial-card__avatar" src="{{ block.settings.avatar | image_url: width: 80 }}" alt="{{ block.settings.name }}" loading="lazy">
-              {% else %}
-                <div class="testimonial-card__avatar" style="background:var(--grey-border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.1rem;color:var(--orange)">
-                  {{ block.settings.name | slice: 0 }}
-                </div>
-              {% endif %}
-              <div>
-                <div class="testimonial-card__name">{{ block.settings.name }}</div>
-                <div class="testimonial-card__meta">{{ block.settings.meta | default: "Verified Buyer" }}</div>
-              </div>
+            <div>
+              <div class="testi-name">{{ block.settings.name }}</div>
+              <div class="testi-meta">{{ block.settings.meta | default: "Verified Buyer" }}</div>
             </div>
           </div>
-        {% endif %}
-      {% endfor %}
+        </div>
+      {% endif %}{% endfor %}
     </div>
   </div>
 </section>
-
 {% schema %}
 {
   "name": "Testimonials",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Reviews" },
-    { "type": "text", "id": "title", "label": "Title", "default": "WHAT THEY SAY" }
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Reviews"},
+    {"type":"text","id":"title","label":"Title","default":"WHAT THEY SAY"}
   ],
-  "blocks": [
-    {
-      "type": "review",
-      "name": "Review",
-      "settings": [
-        { "type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5 },
-        { "type": "textarea", "id": "review_text", "label": "Review text", "default": "These are the most comfortable shoes I have ever worn. The quality is unmatched and I get compliments everywhere I go." },
-        { "type": "text", "id": "name", "label": "Customer name", "default": "Arjun M." },
-        { "type": "text", "id": "meta", "label": "Meta text", "default": "Verified Buyer" },
-        { "type": "image_picker", "id": "avatar", "label": "Avatar image" }
-      ]
-    }
-  ],
-  "presets": [{
-    "name": "Testimonials",
-    "blocks": [
-      { "type": "review", "settings": { "name": "Arjun M.", "review_text": "Best urban footwear I have owned. Built tough, looks premium. UrbanZole never disappoints.", "rating": 5 } },
-      { "type": "review", "settings": { "name": "Priya K.", "review_text": "The sneakers are fire. Wore them to 3 concerts and they still look fresh. 100% repeat buyer.", "rating": 5 } },
-      { "type": "review", "settings": { "name": "Rahul D.", "review_text": "Ordered online, delivered in 2 days. Fit is perfect. The sole grip is insane for the price.", "rating": 5 } },
-      { "type": "review", "settings": { "name": "Sneha R.", "review_text": "Finally a brand that gets urban style. These slides go with everything. Ordered 3 pairs already.", "rating": 5 } }
-    ]
-  }]
+  "blocks":[{"type":"review","name":"Review","settings":[
+    {"type":"range","id":"rating","label":"Rating","min":1,"max":5,"step":1,"default":5},
+    {"type":"textarea","id":"text","label":"Review text","default":"Best shoes I've ever worn. UrbanZole quality is unmatched."},
+    {"type":"text","id":"name","label":"Name","default":"Arjun M."},
+    {"type":"text","id":"meta","label":"Meta","default":"Verified Buyer"},
+    {"type":"image_picker","id":"avatar","label":"Avatar"}
+  ]}],
+  "presets":[{"name":"Testimonials","blocks":[
+    {"type":"review","settings":{"name":"Arjun M.","text":"Best urban footwear I've owned. Built tough, looks premium every time.","rating":5}},
+    {"type":"review","settings":{"name":"Priya K.","text":"Wore them to 3 concerts, still fresh. 100% repeat buyer here!","rating":5}},
+    {"type":"review","settings":{"name":"Rahul D.","text":"Delivered in 2 days. Fit is perfect. The sole grip is insane for the price.","rating":5}},
+    {"type":"review","settings":{"name":"Sneha R.","text":"These slides go with everything. Already ordered 3 pairs. Love this brand.","rating":5}}
+  ]}]
 }
 {% endschema %}

@@ -1,59 +1,48 @@
-{% comment %} Featured Products Section {% endcomment %}
-
-<section class="featured-products">
+<section class="section">
   <div class="container">
     <div class="section-header">
       <div>
-        <div class="section-header__eyebrow label">{{ section.settings.eyebrow | default: "Drop Zone" }}</div>
-        <h2 class="display-lg reveal">{{ section.settings.title | default: "FEATURED DROPS" }}</h2>
+        <div class="t-label reveal">{{ section.settings.eyebrow | default: "Drop Zone" }}</div>
+        <h2 class="section-title reveal d1">{{ section.settings.title | default: "FEATURED DROPS" }}</h2>
       </div>
-      {% if section.settings.view_all_url != blank %}
-        <a href="{{ section.settings.view_all_url }}" class="btn btn--ghost reveal reveal-delay-2">
-          View All
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+      {% if section.settings.link_url != blank %}
+        <a href="{{ section.settings.link_url }}" class="btn btn--ghost reveal d2">View All <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
       {% endif %}
     </div>
-
-    {% assign collection = collections[section.settings.collection] %}
+    {% assign col = collections[section.settings.collection] %}
     <div class="products-grid">
-      {% if collection != blank %}
-        {% for product in collection.products limit: section.settings.product_limit %}
+      {% if col != blank %}
+        {% for product in col.products limit: section.settings.limit %}
           {% render 'product-card', product: product %}
         {% endfor %}
       {% else %}
         {% for i in (1..4) %}
-          <div class="product-card">
-            <div class="product-card__image-wrap" style="background:var(--grey-mid)">
-              {{ 'product-' | append: i | placeholder_svg_tag: 'product-card__img' }}
-              <span class="product-card__badge">New</span>
-              <button class="product-card__quick-add">Quick Add</button>
+          <div class="product-card reveal" style="transition-delay:{{ forloop.index0 | times: 0.1 }}s">
+            <div class="product-card-image" style="background:var(--grey-800)">
+              {{ 'product-' | append: i | placeholder_svg_tag }}
+              <span class="product-badge product-badge--new">New</span>
+              <button class="quick-add-btn" data-product-url="/collections/all">Shop Now</button>
             </div>
-            <div class="product-card__category">Sneakers</div>
-            <div class="product-card__name">Sample Shoe {{ i }}</div>
-            <div class="product-card__price-wrap">
-              <span class="product-card__price">₹2,499</span>
-              <span class="product-card__price--compare">₹3,999</span>
-            </div>
+            <div class="product-card-cat">Sneakers</div>
+            <div class="product-card-name"><a href="/collections/all">Sample Style {{ i }}</a></div>
+            <div class="product-card-price"><span class="price-main">₹2,499</span><span class="price-compare">₹3,999</span></div>
           </div>
         {% endfor %}
       {% endif %}
     </div>
   </div>
 </section>
-
 {% schema %}
 {
   "name": "Featured Products",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Drop Zone" },
-    { "type": "text", "id": "title", "label": "Section title", "default": "FEATURED DROPS" },
-    { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "product_limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 },
-    { "type": "url", "id": "view_all_url", "label": "View all link" }
+    {"type":"text","id":"eyebrow","label":"Eyebrow","default":"Drop Zone"},
+    {"type":"text","id":"title","label":"Title","default":"FEATURED DROPS"},
+    {"type":"collection","id":"collection","label":"Collection"},
+    {"type":"range","id":"limit","label":"Products shown","min":2,"max":8,"step":1,"default":4},
+    {"type":"text","id":"link_label","label":"Button label","default":"View All"},
+    {"type":"url","id":"link_url","label":"Button URL"}
   ],
-  "presets": [{ "name": "Featured Products" }]
+  "presets":[{"name":"Featured Products"}]
 }
 {% endschema %}

@@ -1,156 +1,132 @@
-{% comment %} Product Page Template {% endcomment %}
-
-<article class="product-page container" itemscope itemtype="http://schema.org/Product">
-
-  <div class="product-gallery">
-    <div class="product-gallery__main">
-      {% if product.featured_image %}
-        <img
-          id="main-product-img"
-          src="{{ product.featured_image | image_url: width: 900 }}"
-          alt="{{ product.featured_image.alt | default: product.title | escape }}"
-          loading="eager"
-          fetchpriority="high"
-          style="width:100%;height:100%;object-fit:cover"
-        >
-      {% else %}
-        {{ 'product-1' | placeholder_svg_tag }}
-      {% endif %}
-    </div>
-    {% if product.images.size > 1 %}
-      <div class="product-gallery__thumbs">
-        {% for image in product.images limit: 6 %}
-          <div class="product-gallery__thumb {% if forloop.first %}active{% endif %}">
-            <img
-              src="{{ image | image_url: width: 200 }}"
-              alt="{{ image.alt | default: product.title | escape }}"
-              loading="lazy"
-            >
-          </div>
-        {% endfor %}
+<div class="container">
+  <div class="product-page">
+    <!-- Gallery -->
+    <div class="pg-gallery">
+      <div class="pg-main-img">
+        {% if product.featured_image %}
+          <img id="pg-main-img" src="{{ product.featured_image | image_url: width: 900 }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" loading="eager" fetchpriority="high">
+        {% else %}{{ 'product-1' | placeholder_svg_tag }}{% endif %}
       </div>
-    {% endif %}
-  </div>
-
-  <div class="product-info">
-    <nav class="product-info__breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a>
-      <span>/</span>
-      {% if product.collections.first %}
-        <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
-        <span>/</span>
+      {% if product.images.size > 1 %}
+        <div class="pg-thumbs">
+          {% for img in product.images limit: 8 %}
+            <div class="pg-thumb {% if forloop.first %}active{% endif %}">
+              <img src="{{ img | image_url: width: 200 }}" alt="{{ img.alt | default: product.title | escape }}" loading="lazy" data-full="{{ img | image_url: width: 900 }}">
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
-      <span aria-current="page">{{ product.title }}</span>
-    </nav>
-
-    <h1 class="product-info__title" itemprop="name">{{ product.title }}</h1>
-
-    <div class="product-info__price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-      <span class="product-info__price-main" itemprop="price" content="{{ product.price | money_without_currency }}">
-        {{ product.price | money }}
-      </span>
-      {% if product.compare_at_price > product.price %}
-        <span class="product-info__price-compare">{{ product.compare_at_price | money }}</span>
-        <span class="product-info__price-badge">
-          -{{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}% OFF
-        </span>
-      {% endif %}
-      <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
     </div>
+    <!-- Info -->
+    <div class="pg-info">
+      <nav class="pg-breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span>/</span>
+        {% if product.collections.first %}<a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a><span>/</span>{% endif %}
+        <span aria-current="page">{{ product.title }}</span>
+      </nav>
+      <h1 class="pg-title" itemprop="name">{{ product.title }}</h1>
+      <div class="pg-rating">
+        <div class="pg-rating-stars">★★★★★</div>
+        <span class="pg-rating-count">({{ product.metafields.reviews.rating_count | default: '24' }} reviews)</span>
+      </div>
+      <div class="pg-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+        <span class="pg-price-main" id="pg-price">{{ product.price | money }}</span>
+        {% if product.compare_at_price > product.price %}
+          <span class="pg-price-compare">{{ product.compare_at_price | money }}</span>
+          {% assign save = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+          <span class="pg-price-badge">{{ save }}% OFF</span>
+        {% endif %}
+        <meta itemprop="price" content="{{ product.price | money_without_currency }}">
+        <meta itemprop="priceCurrency" content="{{ cart.currency.iso_code }}">
+        <link itemprop="availability" href="{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+      </div>
 
-    {% unless product.has_only_default_variant %}
-      {% for option in product.options_with_values %}
-        <div style="margin-bottom:1.5rem">
-          <div class="variant-label">
-            {{ option.name }}
-            {% if option.name == 'Size' %}
-              <span>— <a href="/pages/size-guide" style="color:var(--orange);text-decoration:underline">Size Guide</a></span>
-            {% endif %}
-          </div>
-          {% if option.name == 'Size' %}
-            <div class="size-options">
-              {% for value in option.values %}
-                {% assign variant_available = false %}
-                {% for variant in product.variants %}
-                  {% if variant.title contains value and variant.available %}
-                    {% assign variant_available = true %}
-                  {% endif %}
+      {% form 'product', product, data-add-to-cart-form: '' %}
+        <input type="hidden" name="id" id="variant-id" value="{{ product.selected_or_first_available_variant.id }}">
+
+        {% unless product.has_only_default_variant %}
+          {% for option in product.options_with_values %}
+            <div style="margin-bottom:1.5rem">
+              <div class="pg-section-label">
+                {{ option.name }}
+                {% if option.name == 'Size' %}<a href="/pages/size-guide">Size Guide →</a>{% endif %}
+              </div>
+              <div class="size-grid">
+                {% for value in option.values %}
+                  {% assign variant_available = false %}
+                  {% for variant in product.variants %}
+                    {% if variant.title contains value and variant.available %}{% assign variant_available = true %}{% endif %}
+                  {% endfor %}
+                  <button type="button" class="size-btn {% unless variant_available %}unavailable{% endunless %}"
+                    data-variant-id="{% for variant in product.variants %}{% if variant.title contains value %}{{ variant.id }}{% break %}{% endif %}{% endfor %}"
+                    data-price="{% for variant in product.variants %}{% if variant.title contains value %}{{ variant.price }}{% break %}{% endif %}{% endfor %}"
+                    aria-label="{{ option.name }}: {{ value }}{% unless variant_available %} (Sold Out){% endunless %}">
+                    {{ value }}
+                  </button>
                 {% endfor %}
-                <button
-                  class="size-option {% unless variant_available %}sold-out{% endunless %}"
-                  data-variant-id="{{ product.variants | where: 'title', value | first | map: 'id' | first }}"
-                >
-                  {{ value }}
-                </button>
-              {% endfor %}
+              </div>
             </div>
-          {% else %}
-            <div class="size-options">
-              {% for value in option.values %}
-                <button class="size-option">{{ value }}</button>
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
-      {% endfor %}
-    {% endunless %}
+          {% endfor %}
+        {% endunless %}
 
-    {% form 'product', product, data-product-form: '' %}
-      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <div class="qty-row">
+          <div class="qty-box">
+            <button type="button" class="qty-box-btn" data-action="dec" aria-label="Decrease">−</button>
+            <input class="qty-box-input" type="number" name="quantity" value="1" min="1" max="99" aria-label="Quantity">
+            <button type="button" class="qty-box-btn" data-action="inc" aria-label="Increase">+</button>
+          </div>
+          <button type="submit" class="btn btn--primary pg-add-btn" {% unless product.available %}disabled{% endunless %}>
+            {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+          </button>
+          <button type="button" class="pg-wishlist-btn" aria-label="Add to wishlist">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+      {% endform %}
 
-      <div class="product-add-wrap">
-        <div class="qty-input">
-          <button type="button" class="qty-btn" data-action="dec" aria-label="Decrease quantity">−</button>
-          <input class="qty-num" type="number" name="quantity" value="1" min="1" max="10" readonly>
-          <button type="button" class="qty-btn" data-action="inc" aria-label="Increase quantity">+</button>
+      <div class="pg-features">
+        <div class="pg-feature">
+          <div class="pg-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+          <div><div class="pg-feature-title">Free Shipping</div><div class="pg-feature-text">On all orders above ₹999. Delivered in 2–5 days.</div></div>
         </div>
-        <button
-          type="submit"
-          class="btn btn--primary"
-          style="flex:1"
-          {% unless product.available %}disabled{% endunless %}
-        >
-          {% if product.available %}
-            Add to Cart
-          {% else %}
-            Sold Out
-          {% endif %}
-        </button>
+        <div class="pg-feature">
+          <div class="pg-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14l-4-4 4-4M5 10h11a4 4 0 0 1 0 8h-1"/></svg></div>
+          <div><div class="pg-feature-title">30-Day Returns</div><div class="pg-feature-text">Hassle-free returns. No questions asked.</div></div>
+        </div>
+        <div class="pg-feature">
+          <div class="pg-feature-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div><div class="pg-feature-title">100% Authentic</div><div class="pg-feature-text">Every pair quality-checked before shipping.</div></div>
+        </div>
       </div>
-    {% endform %}
 
-    <div class="product-info__features">
-      <div class="feature-row">
-        <div class="feature-row__icon">🚚</div>
-        <div class="feature-row__text">
-          <div class="feature-row__title">Free Shipping</div>
-          On orders above ₹999. Delivered in 2–5 business days.
+      {% if product.description != blank %}
+      <div class="pg-accordion">
+        <div class="pg-acc-item open">
+          <button class="pg-acc-head" type="button" aria-expanded="true">Description <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+          <div class="pg-acc-body"><div class="pg-acc-text">{{ product.description }}</div></div>
+        </div>
+        <div class="pg-acc-item">
+          <button class="pg-acc-head" type="button" aria-expanded="false">Materials & Care <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+          <div class="pg-acc-body"><div class="pg-acc-text">Premium materials sourced for durability and comfort. Clean with a damp cloth. Air dry only. Store away from direct sunlight.</div></div>
+        </div>
+        <div class="pg-acc-item">
+          <button class="pg-acc-head" type="button" aria-expanded="false">Shipping & Returns <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+          <div class="pg-acc-body"><div class="pg-acc-text">Free shipping on orders above ₹999. Standard delivery 2–5 business days. Express available at checkout. 30-day returns accepted on unworn items in original packaging.</div></div>
         </div>
       </div>
-      <div class="feature-row">
-        <div class="feature-row__icon">↩️</div>
-        <div class="feature-row__text">
-          <div class="feature-row__title">30-Day Returns</div>
-          Hassle-free returns. No questions asked.
-        </div>
-      </div>
-      <div class="feature-row">
-        <div class="feature-row__icon">🛡️</div>
-        <div class="feature-row__text">
-          <div class="feature-row__title">Authentic Guarantee</div>
-          100% genuine products. Every pair quality-checked.
-        </div>
-      </div>
+      {% endif %}
     </div>
-
-    {% if product.description != blank %}
-      <div style="margin-top:2rem;padding-top:2rem;border-top:1px solid var(--grey-border)">
-        <h2 style="font-family:var(--font-display);font-size:1.2rem;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:1rem">Product Details</h2>
-        <div style="color:var(--grey-muted);font-size:0.9rem;line-height:1.8" itemprop="description">
-          {{ product.description }}
-        </div>
-      </div>
-    {% endif %}
   </div>
-
-</article>
+</div>
+<script>
+  // Thumbnail click
+  document.querySelectorAll('.pg-thumb').forEach(thumb => {
+    thumb.addEventListener('click', function() {
+      document.querySelectorAll('.pg-thumb').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      var img = document.getElementById('pg-main-img');
+      var full = this.querySelector('img')?.dataset.full;
+      if (img && full) img.src = full;
+    });
+  });
+</script>

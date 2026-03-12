@@ -1,89 +1,47 @@
-{% comment %} Header Section — UrbanZole {% endcomment %}
-
 <header class="site-header" role="banner">
-  <a href="{{ routes.root_url }}" class="header__logo" aria-label="{{ shop.name }} — Home">
-    URBAN<span>ZOLE</span>
-  </a>
-
-  <nav class="header__nav" role="navigation" aria-label="Main navigation">
-    {% for link in linklists[section.settings.menu].links %}
-      <a href="{{ link.url }}"
-         {% if link.active %}aria-current="page"{% endif %}>
-        {{ link.title }}
-      </a>
-    {% endfor %}
-  </nav>
-
-  <div class="header__actions">
-    {% if shop.customer_accounts_enabled %}
-      <a href="{{ routes.account_url }}" class="header__icon-btn" aria-label="Account">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      </a>
-    {% endif %}
-
-    <a href="{{ routes.search_url }}" class="header__icon-btn" aria-label="Search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.35-4.35"/>
-      </svg>
+  <div class="header-inner">
+    <a href="{{ routes.root_url }}" class="header-logo" aria-label="{{ shop.name }}">
+      URBAN<span>ZOLE</span>
     </a>
-
-    <button class="header__icon-btn" aria-label="Open cart" data-open-cart>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <path d="M16 10a4 4 0 0 1-8 0"/>
-      </svg>
-      <span class="cart-badge" aria-label="Cart items">0</span>
-    </button>
-
-    <button class="header__menu-btn" aria-label="Menu" aria-expanded="false">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <nav class="header-nav" aria-label="Main navigation">
+      {% for link in linklists[section.settings.menu].links %}
+        <a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-open-search aria-label="Search">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ customer ? routes.account_url : routes.account_login_url }}" class="icon-btn" aria-label="{{ customer ? 'Account' : 'Sign in' }}">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      {% endif %}
+      <button class="icon-btn header-cart-btn" data-open-cart aria-label="Cart">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-badge" aria-label="items in cart">0</span>
+      </button>
+      <button class="header-menu-btn" id="header-menu-btn" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
 </header>
-
-{% comment %} Mobile Nav {% endcomment %}
-<nav class="mobile-nav" aria-hidden="true" style="
-  position: fixed;
-  inset: 0;
-  background: var(--black);
-  z-index: 99;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 2rem var(--gutter);
-  transform: translateX(-100%);
-  transition: transform 0.4s var(--ease-out);
-">
-  {% for link in linklists[section.settings.menu].links %}
-    <a href="{{ link.url }}" style="
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 8vw, 5rem);
-      text-transform: uppercase;
-      line-height: 1.1;
-      color: var(--white);
-      border-bottom: 1px solid var(--grey-border);
-      padding: 1rem 0;
-    ">{{ link.title }}</a>
-  {% endfor %}
-</nav>
-
+<script>
+  document.getElementById('header-menu-btn').addEventListener('click', function() {
+    var menu = document.getElementById('mobile-menu');
+    var expanded = this.getAttribute('aria-expanded') === 'true';
+    this.setAttribute('aria-expanded', String(!expanded));
+    menu.setAttribute('aria-hidden', String(expanded));
+    this.classList.toggle('open', !expanded);
+    document.body.classList.toggle('no-scroll', !expanded);
+  });
+</script>
 {% schema %}
 {
   "name": "Header",
   "settings": [
-    {
-      "type": "link_list",
-      "id": "menu",
-      "default": "main-menu",
-      "label": "Navigation menu"
-    }
+    {"type":"link_list","id":"menu","default":"main-menu","label":"Navigation menu"}
   ]
 }
 {% endschema %}

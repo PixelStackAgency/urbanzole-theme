@@ -1,0 +1,35 @@
+<div class="search-page container">
+  <div class="t-label" style="margin-bottom:1rem">Search</div>
+  <h1 class="section-title" style="margin-bottom:2rem">
+    {% if search.performed %}
+      {% if search.results_count > 0 %}{{ search.results_count }} results for "{{ search.terms }}"
+      {% else %}No results for "{{ search.terms }}"{% endif %}
+    {% else %}Search{% endif %}
+  </h1>
+  <form action="{{ routes.search_url }}" method="get" class="search-page-form">
+    <input type="hidden" name="type" value="product">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--grey-400);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-page-input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search for sneakers, boots, sandals..." autocomplete="off">
+    <button type="submit" class="btn btn--primary search-page-btn">Search</button>
+  </form>
+  {% if search.performed %}
+    {% if search.results_count > 0 %}
+      <div class="products-grid">
+        {% for item in search.results %}
+          {% if item.object_type == 'product' %}
+            {% render 'product-card', product: item %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="search-no-results">
+        <h3>No Results Found</h3>
+        <p>We couldn't find anything for "{{ search.terms }}". Try different keywords or <a href="{{ routes.all_products_collection_url }}" style="color:var(--orange)">browse all products</a>.</p>
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="search-no-results">
+      <p>Type above to search our entire collection of urban footwear.</p>
+    </div>
+  {% endif %}
+</div>

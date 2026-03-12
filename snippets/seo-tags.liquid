@@ -1,0 +1,15 @@
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ page_title | default: shop.name }}">
+<meta property="og:description" content="{{ page_description | default: shop.description | escape }}">
+<meta name="twitter:card" content="summary_large_image">
+{% if product %}
+  <meta property="og:type" content="product">
+  {% if product.featured_image %}<meta property="og:image" content="{{ product.featured_image | image_url: width: 1200 }}">{% endif %}
+  <meta property="product:price:amount" content="{{ product.price | money_without_currency }}">
+  <meta property="product:price:currency" content="{{ cart.currency.iso_code }}">
+{% elsif collection.image %}
+  <meta property="og:image" content="{{ collection.image | image_url: width: 1200 }}">
+{% elsif settings.og_image %}
+  <meta property="og:image" content="{{ settings.og_image | image_url: width: 1200 }}">
+{% endif %}

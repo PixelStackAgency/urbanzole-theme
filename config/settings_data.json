@@ -1,7 +1,1 @@
-{
-  "current": {
-    "accent_color": "#FF4500",
-    "body_font_size": "16px",
-    "cart_type": "drawer"
-  }
-}
+{"current":{"accent":"#FF4500","cart_type":"drawer","nav_menu":"main-menu"}}
